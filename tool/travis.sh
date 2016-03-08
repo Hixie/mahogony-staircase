@@ -7,10 +7,9 @@
 # Fast fail the script on failures.
 set -e
 
-# Verify that the libraries are error free.
-dartanalyzer --fatal-warnings \
-  lib/sample.dart \
-  test/all_test.dart
+git clone https://github.com/flutter/flutter.git
+export PATH=`pwd`/flutter/bin:$PATH
+flutter doctor
 
-# Run the tests.
-pub run test
+(cd apps/chapter1/world_clock; flutter analyze)
+(cd apps/chapter1/world_clock; flutter test)

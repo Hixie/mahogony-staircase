@@ -1,9 +1,10 @@
-# REPLACE_ME
+Flutter: A Walk Up A Mahogony Staircase
+=======================================
 
-A library for Flutter developers. It is awesome.
+This repository contains the assets for a talk about the Flutter
+framework's design.
 
-## Features and bugs
+The talk's script is in the `script/` directory.
 
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: https://github.com/flutter/REPLACE_ME/issues
+The talk involves various apps. They can be found in the `apps/`
+directory.
