@@ -7,9 +7,12 @@
 # Fast fail the script on failures.
 set -e
 
+pushd ..
 git clone https://github.com/flutter/flutter.git
-export PATH=`pwd`/flutter/bin:$PATH
+export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
 flutter doctor
+popd
 
+(cd apps/chapter1/world_clock; pub get)
 (cd apps/chapter1/world_clock; flutter analyze)
-(cd apps/chapter1/world_clock; flutter test)
+# (cd apps/chapter1/world_clock; flutter test)
