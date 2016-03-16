@@ -26,9 +26,22 @@ Flutter, this is not it. Nor is it a comprehensive API description.
 Chapter 1: Let's create an app!
 -------------------------------
 
-![We're going to build a World Clock application.](../images/vision.jpeg)
+Let's write a trivial app. It'll just show a table with my wishlist of items I want from the Märklin 2016 model train catalogue.
 
 ```
-$ flutter create world_clock
+$ flutter create trains
 ```
 
+Type type type.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter1/trains/lib/main.dart>
+
+```
+$ flutter analyze
+$ flutter run
+```
+
+Success!
+
+Ok. Let's add a checkbox to the first cell of each row so that we can
+track which one's I've preordered.
