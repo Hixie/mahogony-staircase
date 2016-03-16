@@ -26,8 +26,9 @@ Flutter, this is not it. Nor is it a comprehensive API description.
 Chapter 1: Let's create an app!
 -------------------------------
 
-
+![We're going to build a World Clock application.](../images/vision.jpeg)
 
 ```
 $ flutter create world_clock
 ```
+
