@@ -1,0 +1,5 @@
+name: world_clock
+description: Create a new Flutter project.
+dependencies:
+  flutter:
+    path: ../../../../flutter/packages/flutter
