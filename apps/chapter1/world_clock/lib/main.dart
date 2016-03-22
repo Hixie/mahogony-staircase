@@ -61,7 +61,7 @@ void paintClock(Canvas c, double x, double y, double radius, DateTime utc, Durat
   ));
   title.maxWidth = radius * 2.0;
   title.layout();
-  title.paint(c, new Offset(-radius, radius * 0.4));
+  c.drawParagraph(title, new Offset(-radius, radius * 0.4));
 
   Paint markerPaint = new Paint()
     ..color = textColor
@@ -91,7 +91,6 @@ void paintClock(Canvas c, double x, double y, double radius, DateTime utc, Durat
 Timer nextTickTimer;
 
 void render(Duration duration) {
-print('tick');
   nextTickTimer?.cancel();
   nextTickTimer = null;
 
@@ -115,7 +114,7 @@ print('tick');
   ));
   title.maxWidth = window.size.width - window.padding.left - window.padding.right;
   title.layout();
-  title.paint(c, new Offset(window.padding.left, window.padding.top));
+  c.drawParagraph(title, new Offset(window.padding.left, window.padding.top));
 
   // Clocks
   final double screenWidth = window.size.width - window.padding.left - window.padding.right;
@@ -144,6 +143,7 @@ print('tick');
              0.0, 0.0, 0.0, 1.0]
   ));
   builder.addPicture(Offset.zero, picture);
+  // builder.addPerformanceOverlay(0x0F, new Rect.fromLTWH(60.0, 260.0, 275.0, 180.0));
   Scene scene = builder.build();
   window.render(scene);
 
