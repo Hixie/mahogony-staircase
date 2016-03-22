@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:mojo/application.dart';
+import 'package:mojo/bindings.dart' as mojo;
 import 'package:mojo/core.dart' as mojo;
 import 'package:mojo/mojo/service_provider.mojom.dart' as mojom;
 import 'package:mojo/mojo/shell.mojom.dart' as mojom;
@@ -10,6 +11,7 @@ import 'package:mojo/mojo/url_request.mojom.dart' as mojom;
 import 'package:mojo/mojo/url_response.mojom.dart' as mojom;
 import 'package:mojo_services/mojo/network_service.mojom.dart' as mojom;
 import 'package:mojo_services/mojo/url_loader.mojom.dart' as mojom;
+import 'package:sky_services/pointer/pointer.mojom.dart' as mojom;
 
 mojom.NetworkServiceProxy networkServiceProxy = _initNetworkServiceProxy();
 mojom.NetworkServiceProxy _initNetworkServiceProxy() {
@@ -114,6 +116,7 @@ const double captionSize = 24.0;
 const double tableTextSize = 16.0;
 const double horizontalPadding = 4.0;
 const double verticalPadding = 4.0;
+const double iconSize = 24.0;
 
 final TextStyle kCaptionTextStyle = new TextStyle(
   fontSize: tableTextSize,
@@ -149,15 +152,20 @@ class Train {
   final Text code;
   Image image;
   final Text description;
+
+  bool checked = false;
+
+  double yTop;
+  double yBottom;
 }
 
 final List<Train> kTrainData = <Train>[
   new Train('49954', 'https://static.maerklin.de/media/bc/02/bc028d6e5f98ccaeb344118d64927edd1451859002.jpg', 'Type 100 crane car and type 817 boom tender car.'),
   new Train('26602', 'https://static.maerklin.de/media/cc/b9/ccb96e67093f188d67acb4ca97b407da1452597002.jpg', 'Class Köf II Diesel Locomotive with stake cars loaded with bricks and construction steel mats.'),
-  new Train('46925', 'https://static.maerklin.de/media/ad/3f/ad3fa11c35f10737cb54320b9e5c006a1451857433.jpg', 'Set with 2 Type Kbs Stake Cars transporting brewery tanks (storage tanks).'),
+  new Train('46925', 'https://static.maerklin.de/media/ad/3f/ad3fa11c35f10737cb54320b9e5c006a1451857433.jpg', 'Set with of two stake cars transporting four brewery tanks (storage tanks).'),
   new Train('46870', 'https://static.maerklin.de/media/ed/36/ed365bf5b8c89cc63d54afa81db80df01451857433.jpg', 'Swiss Federal Railways (SBB) four-axle flat cars with telescoping covers loaded with coils.'),
   new Train('47724', 'https://static.maerklin.de/media/20/fe/20fe74d67d07417352fd08b164f271c41451859002.jpg', 'Swedish State Railways (SJ) two-axle container transport cars loaded with two "Inno freight" WoodTainer XXL containers, painted and lettered for "green cargo".'),
-  new Train('47319', 'https://static.maerklin.de/media/6e/32/6e32c9c7153637b9e0d484a1958703191451859002.jpg', 'Stake cars with steel and pipe.'),
+  new Train('47319', 'https://static.maerklin.de/media/6e/32/6e32c9c7153637b9e0d484a1958703191451859002.jpg', 'Four stake cars. One with two sets of short pipes, one with long pipes, one with steel bars, and one with I-beams.'),
 ];
 
 final Text title = new Text(
@@ -188,15 +196,18 @@ void render(Duration duration) {
     captionSize
   ));
 
-  final List<double> columnWidths = captions.map/*<double>*/((Text caption) => caption.naturalMaxWidth).toList();
+  final List<double> columnWidths = captions.map/*<double>*/((Text caption) => caption.naturalMaxWidth + horizontalPadding * 2.0).toList();
+  columnWidths[0] = math.max(columnWidths[0], iconSize + horizontalPadding * 2.0);
+  double imageWidths = 0.0;
   for (int index = 0; index < kTrainData.length; index += 1) {
     Train train = kTrainData[index];
     columnWidths[0] = math.max(columnWidths[0], train.code.naturalMaxWidth + horizontalPadding * 2.0);
-    columnWidths[1] = math.max(columnWidths[1], (train.image?.width ?? 0.0) + horizontalPadding * 2.0);
+    if (train.image != null)
+      imageWidths = math.max(imageWidths, train.image.width.toDouble());
     columnWidths[2] = math.max(columnWidths[2], train.description.naturalMaxWidth + horizontalPadding * 2.0);
   }
   // make the image column max 40% (and take into account the device pixel ratio)
-  columnWidths[1] = math.min(columnWidths[1] / window.devicePixelRatio, width * 0.4);
+  columnWidths[1] = math.max(columnWidths[1], math.min(imageWidths / window.devicePixelRatio, width * 0.4));
   columnWidths[2] = width - (columnWidths[0] + columnWidths[1]);
 
   final Path path = new Path();
@@ -214,14 +225,24 @@ void render(Duration duration) {
   y += tableTextSize + verticalPadding * 2.0;
   for (int index = 0; index < kTrainData.length; index += 1) {
     final Train train = kTrainData[index];
-    y += verticalPadding;
+    train.yTop = y;
     x = window.padding.left;
     path.moveTo(x, y);
-    train.code.paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, columnWidths[0] - horizontalPadding * 2.0, tableTextSize));
-    final double rowHeight = math.max(train.description.actualHeight(columnWidths[2] - horizontalPadding * 2.0), tableTextSize);
+    y += verticalPadding;
+    train.code.paint(c, new Rect.fromLTWH(x + horizontalPadding, y, columnWidths[0] - horizontalPadding * 2.0, tableTextSize));
+    final double codeHeight = train.code.actualHeight(columnWidths[0] - horizontalPadding * 2.0);
+    if (train.checked) {
+      Paint paint = new Paint();
+      paint.color = const Color(0xFF43A047);
+      c.drawCircle(new Point(x + columnWidths[0] / 2.0, y + codeHeight + verticalPadding + iconSize / 2.0), iconSize / 2.0, paint);
+    }
+    final double rowHeight = math.max(
+      codeHeight + horizontalPadding + iconSize,
+      train.description.actualHeight(columnWidths[2] - horizontalPadding * 2.0)
+    );
     x += columnWidths[0];
     if (train.image != null) {
-      final Rect destRect = new Rect.fromLTWH(x, y, columnWidths[1], rowHeight + verticalPadding * 2.0);
+      final Rect destRect = new Rect.fromLTWH(x, y - verticalPadding, columnWidths[1], rowHeight + verticalPadding * 2.0);
       final double sourceHeight = train.image.width.toDouble() * destRect.height / destRect.width;
       final Rect sourceRect = new Rect.fromLTWH(
         0.0,
@@ -232,10 +253,11 @@ void render(Duration duration) {
       c.drawImageRect(train.image, sourceRect, destRect, null);
     }
     x += columnWidths[1];
-    train.description.paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, columnWidths[2] - horizontalPadding * 2.0, rowHeight));
+    train.description.paint(c, new Rect.fromLTWH(x + horizontalPadding, y, columnWidths[2] - horizontalPadding * 2.0, rowHeight));
     x += columnWidths[2];
-    path.lineTo(x, y);
-    y += rowHeight + verticalPadding * 2.0;
+    path.lineTo(x, y - verticalPadding);
+    y += rowHeight + verticalPadding;
+    train.yBottom = y;
   }
   final double tableBottom = y;
 
@@ -262,8 +284,32 @@ void render(Duration duration) {
   window.render(scene);
 }
 
+void handlePointerPacket(ByteData serializedPacket) {
+  final mojo.Message message = new mojo.Message(
+    serializedPacket,
+    const <mojo.MojoHandle>[],
+    serializedPacket.lengthInBytes,
+    0
+  );
+  final mojom.PointerPacket packet = mojom.PointerPacket.deserialize(message);
+  for (mojom.Pointer event in packet.pointers) {
+    if (event.type == mojom.PointerType.down) {
+      double y = event.y;
+      for (int index = 0; index < kTrainData.length; index += 1) {
+        final Train train = kTrainData[index];
+        if (train.yTop < y && train.yBottom > y) {
+          train.checked = !train.checked;
+          window.scheduleFrame();
+          break;
+        }
+      }
+    }
+  }
+}
+
 void main() { 
   window.onBeginFrame = render;
   window.onMetricsChanged = window.scheduleFrame;
+  window.onPointerPacket = handlePointerPacket;
   window.scheduleFrame();
 }
