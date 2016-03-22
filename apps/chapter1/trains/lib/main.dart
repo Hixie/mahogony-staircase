@@ -113,7 +113,17 @@ class Text {
 const double captionSize = 24.0;
 const double tableTextSize = 16.0;
 const double horizontalPadding = 4.0;
-const double verticalPadding = 8.0;
+const double verticalPadding = 4.0;
+
+final TextStyle kCaptionTextStyle = new TextStyle(
+  fontSize: tableTextSize,
+  fontWeight: FontWeight.bold,
+  color: const Color(0xFF000000)
+);
+final TextStyle kCellTextStyle = new TextStyle(
+  fontSize: tableTextSize,
+  color: const Color(0xFF004D40)
+);
 
 class Train {
   Train(
@@ -129,10 +139,7 @@ class Train {
       ),
       description = new Text(
         text: description,
-        textStyle: new TextStyle(
-          fontSize: tableTextSize,
-          color: const Color(0xFF004D40)
-        )
+        textStyle: kCellTextStyle
       ) {
     fetchImage(imageUrl, (Image resolvedImage) {
       image = resolvedImage;
@@ -158,6 +165,11 @@ final Text title = new Text(
   textStyle: new TextStyle(fontSize: captionSize, color: const Color(0xFF4CAF50)),
   paragraphStyle: new ParagraphStyle(textAlign: TextAlign.center)
 );
+final List<Text> captions = <Text>[
+  new Text(text: 'Code', textStyle: kCaptionTextStyle),
+  new Text(text: 'Image', textStyle: kCaptionTextStyle),
+  new Text(text: 'Description', textStyle: kCaptionTextStyle),
+];
 
 void render(Duration duration) {
   final Rect bounds = Point.origin & window.size;
@@ -176,7 +188,7 @@ void render(Duration duration) {
     captionSize
   ));
 
-  final List<double> columnWidths = new List<double>.filled(3, 0.0);
+  final List<double> columnWidths = captions.map/*<double>*/((Text caption) => caption.naturalMaxWidth).toList();
   for (int index = 0; index < kTrainData.length; index += 1) {
     Train train = kTrainData[index];
     columnWidths[0] = math.max(columnWidths[0], train.code.naturalMaxWidth + horizontalPadding * 2.0);
@@ -187,11 +199,24 @@ void render(Duration duration) {
   columnWidths[1] = math.min(columnWidths[1] / window.devicePixelRatio, width * 0.4);
   columnWidths[2] = width - (columnWidths[0] + columnWidths[1]);
 
-  double y = window.padding.top + verticalPadding + captionSize + verticalPadding;
+  final Path path = new Path();
+
+  final double tableTop = window.padding.top + verticalPadding + captionSize + verticalPadding * 2.0;
+  double y = tableTop;
+  double x = window.padding.left;
+  double rowHeight = 0.0;
+  for (int index = 0; index < captions.length; index += 1) {
+    final double cellInnerWidth = columnWidths[index] - horizontalPadding * 2.0;
+    rowHeight = math.max(rowHeight, captions[index].actualHeight(cellInnerWidth));
+    captions[index].paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, cellInnerWidth, rowHeight));
+    x += columnWidths[index];
+  }
+  y += tableTextSize + verticalPadding * 2.0;
   for (int index = 0; index < kTrainData.length; index += 1) {
     final Train train = kTrainData[index];
     y += verticalPadding;
-    double x = window.padding.left;
+    x = window.padding.left;
+    path.moveTo(x, y);
     train.code.paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, columnWidths[0] - horizontalPadding * 2.0, tableTextSize));
     final double rowHeight = math.max(train.description.actualHeight(columnWidths[2] - horizontalPadding * 2.0), tableTextSize);
     x += columnWidths[0];
@@ -208,10 +233,21 @@ void render(Duration duration) {
     }
     x += columnWidths[1];
     train.description.paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, columnWidths[2] - horizontalPadding * 2.0, rowHeight));
+    x += columnWidths[2];
+    path.lineTo(x, y);
     y += rowHeight + verticalPadding * 2.0;
   }
+  final double tableBottom = y;
 
-  // XXX draw lines
+  path.moveTo(window.padding.left + columnWidths[0], tableTop);
+  path.lineTo(window.padding.left + columnWidths[0], tableBottom);
+  path.moveTo(window.padding.left + columnWidths[0] + columnWidths[1], tableTop);
+  path.lineTo(window.padding.left + columnWidths[0] + columnWidths[1], tableBottom);
+
+  Paint lines = new Paint();
+  lines.style = PaintingStyle.stroke;
+  lines.strokeWidth = 0.0; // hairlines
+  c.drawPath(path, lines);
 
   Picture picture = recorder.endRecording();
   SceneBuilder builder = new SceneBuilder();
