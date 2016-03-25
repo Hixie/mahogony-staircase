@@ -16,6 +16,7 @@ class Train {
   RenderImage imageRenderer;
 
   bool checked = false;
+  RenderOpacity checkRenderer;
 }
 
 final List<Train> kTrainData = <Train>[
@@ -172,35 +173,148 @@ class MinColumnWidth extends ColumnWidth {
   }
 }
 
+class TableBorder extends Border {
+  const TableBorder({
+    BorderSide top: BorderSide.none,
+    BorderSide right: BorderSide.none,
+    BorderSide bottom: BorderSide.none,
+    BorderSide left: BorderSide.none,
+    this.horizontalInside: BorderSide.none,
+    this.verticalInside: BorderSide.none
+  }) : super(
+    top: top,
+    right: right,
+    bottom: bottom,
+    left: left
+  );
+
+  factory TableBorder.all({
+    Color color: const Color(0xFF000000),
+    double width: 1.0
+  }) {
+    final BorderSide side = new BorderSide(color: color, width: width);
+    return new TableBorder(top: side, right: side, bottom: side, left: side, horizontalInside: side, verticalInside: side);
+  }
+
+  factory TableBorder.symmetric({
+    BorderSide inside: BorderSide.none,
+    BorderSide outside: BorderSide.none
+  }) {
+    return new TableBorder(
+      top: outside,
+      right: outside,
+      bottom: outside,
+      left: outside,
+      horizontalInside: inside,
+      verticalInside: inside
+    );
+  }
+
+  final BorderSide horizontalInside;
+
+  final BorderSide verticalInside;
+
+  @override
+  TableBorder scale(double t) {
+    return new TableBorder(
+      top: top.copyWith(width: t * top.width),
+      right: right.copyWith(width: t * right.width),
+      bottom: bottom.copyWith(width: t * bottom.width),
+      left: left.copyWith(width: t * left.width),
+      horizontalInside: horizontalInside.copyWith(width: t * horizontalInside.width),
+      verticalInside: verticalInside.copyWith(width: t * verticalInside.width)
+    );
+  }
+
+  static TableBorder lerp(TableBorder a, TableBorder b, double t) {
+    if (a == null && b == null)
+      return null;
+    if (a == null)
+      return b.scale(t);
+    if (b == null)
+      return a.scale(1.0 - t);
+    return new TableBorder(
+      top: BorderSide.lerp(a.top, b.top, t),
+      right: BorderSide.lerp(a.right, b.right, t),
+      bottom: BorderSide.lerp(a.bottom, b.bottom, t),
+      left: BorderSide.lerp(a.left, b.left, t),
+      horizontalInside: BorderSide.lerp(a.horizontalInside, b.horizontalInside, t),
+      verticalInside: BorderSide.lerp(a.verticalInside, b.verticalInside, t)
+    );
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    if (super != other)
+      return false;
+    final TableBorder typedOther = other;
+    return horizontalInside == typedOther.horizontalInside &&
+           verticalInside == typedOther.verticalInside;
+  }
+
+  @override
+  int get hashCode => hashValues(super.hashCode, horizontalInside, verticalInside);
+
+  @override
+  String toString() => 'TableBorder($top, $right, $bottom, $left, $horizontalInside, $verticalInside)';
+}
+
+enum CellVerticalAlignment {
+  /// Cells with this alignment are placed with their top at the top of the row.
+  top,
+
+  /// Cells with this alignment are vertically centered in the row.
+  middle,
+
+  /// Cells with this alignment are placed with their bottom at the bottom of the row.
+  bottom,
+
+  /// Cells with this alignment are aligned such that they all share the same
+  /// baseline. Cells with no baseline are top-aligned instead. The baseline
+  /// used is specified by [RenderTable.baseline]. It is not valid to use the
+  /// baseline value if [RenderTable.baseline] is not specified.
+  baseline,
+
+  /// Cells with this alignment are sized to be as tall as the row, then made to fit the row.
+  /// If all the cells have this alignment, then the row will have zero height.
+  fill
+}
+
+/// Parent data used by [RenderTable] for its children.
+class TableCellParentData extends BoxParentData {
+  CellVerticalAlignment verticalAlignment = CellVerticalAlignment.top;
+
+  @override
+  String toString() => '${super.toString()}; $verticalAlignment';
+}
+
 class RenderTable extends RenderBox {
   RenderTable({
-    int columns: 0,
+    int columns,
     int rows,
     Map<int, ColumnWidth> columnWidths,
     ColumnWidth defaultColumnWidth: const FlexColumnWidth(1.0),
+    TableBorder border,
+    TextBaseline textBaseline,
     List<List<RenderBox>> children
   }) {
-    assert(columns != null);
-    assert(columns >= 0);
+    assert(columns != null || (children != null && children.isNotEmpty));
+    assert(columns == null || columns >= 0);
     assert(rows == null || rows >= 0);
     assert(rows == null || children == null);
     assert(defaultColumnWidth != null);
-    _columns = columns;
+    _columns = columns ?? children.first.length;
     _rows = rows ?? 0;
     _children = new List<RenderBox>()..length = _columns * _rows;
     _columnWidths = columnWidths ?? new HashMap<int, ColumnWidth>();
     _defaultColumnWidth = defaultColumnWidth;
+    _border = border;
+    _textBaseline = textBaseline;
     for (List<RenderBox> row in children)
       addRow(row);
   }
 
-  // TODO(ianh): Add a 'borders' field on the table, to paint the borders.
-  // use a Border subclass with "insideVertical" and "insideHorizontal" fields?
-
   // TODO(ianh): Add a 'decoration' field to the children's parent data, to paint on each cell.
-
-  // TODO(ianh): Add a 'verticalAlignment' field to the children's parent data, to align the cells.
-  // Values would be baseline, top, bottom, middle.
 
   // Children are stored in row-major order.
   // _children.length must be rows * columns
@@ -262,10 +376,34 @@ class RenderTable extends RenderBox {
     markNeedsLayout();
   }
 
+  TableBorder get border => _border;
+  TableBorder _border;
+  set border(TableBorder value) {
+    if (border == value)
+      return;
+    _border = value;
+    markNeedsPaint();
+  }
+
+  TextBaseline get textBaseline => _textBaseline;
+  TextBaseline _textBaseline;
+  void set textBaseline (TextBaseline value) {
+    if (_textBaseline == value)
+      return;
+    _textBaseline = value;
+    markNeedsLayout();
+  }
+
   bool debugIsValidCoordinate(int x, int y) {
     assert(x != null);
     assert(y != null);
     return x >= 0 && x < columns && y >= 0 && y < rows;
+  }
+
+  @override
+  void setupParentData(RenderObject child) {
+    if (child.parentData is! TableCellParentData)
+      child.parentData = new TableCellParentData();
   }
 
   void setChild(int x, int y, RenderBox value) {
@@ -291,10 +429,10 @@ class RenderTable extends RenderBox {
   }
 
   @override
-  void attach() {
-    super.attach();
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
     for (RenderBox child in _children)
-      child?.attach();
+      child?.attach(owner);
   }
 
   @override
@@ -361,22 +499,12 @@ class RenderTable extends RenderBox {
     return getMinIntrinsicHeight(constraints);
   }
 
+  double _baselineDistance;
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     // returns the baseline of the first cell that has a baseline in the first row
     assert(!needsLayout);
-    for (int x = 0; x < columns; x += 1) {
-      RenderBox child = _children[x];
-      if (child != null) {
-        // TODO(ianh): skip children that aren't aligned to the baseline
-        double result = child.getDistanceToActualBaseline(baseline);
-        if (result != null) {
-          final BoxParentData childParentData = child.parentData;
-          return result + childParentData.offset.dy;
-        }
-      }
-    }
-    return null;
+    return _baselineDistance;
   }
 
   Iterable<RenderBox> column(int x) sync* {
@@ -444,38 +572,96 @@ class RenderTable extends RenderBox {
     return widths;
   }
 
+  // cache the table geometry for painting purposes
+  List<double> _rowTops = <double>[];
+  List<double> _columnLefts;
+
   @override
   void performLayout() {
     final List<double> widths = computeColumnWidths(constraints);
     final List<double> positions = new List<double>(columns);
+    _rowTops.clear();
     positions[0] = 0.0;
     for (int x = 1; x < columns; x += 1)
       positions[x] = positions[x-1] + widths[x-1];
+    _columnLefts = positions;
     assert(!positions.any((double value) => value == null));
+    _baselineDistance = null;
     // then, lay out each row
     double rowTop = 0.0;
     for (int y = 0; y < rows; y += 1) {
+      _rowTops.add(rowTop);
       double rowHeight = 0.0;
+      bool haveBaseline = false;
+      double beforeBaselineDistance = 0.0;
+      double afterBaselineDistance = 0.0;
+      List<double> baselines = new List<double>(columns);
       for (int x = 0; x < columns; x += 1) {
         final int xy = x + y * columns;
         RenderBox child = _children[xy];
         if (child != null) {
-          child.layout(new BoxConstraints.tightFor(width: widths[x]), parentUsesSize: true);
-          rowHeight = math.max(rowHeight, child.size.height);
+          TableCellParentData childParentData = child.parentData;
+          switch (childParentData.verticalAlignment) {
+            case CellVerticalAlignment.baseline:
+              assert(textBaseline != null);
+              child.layout(new BoxConstraints.tightFor(width: widths[x]), parentUsesSize: true);
+              double childBaseline = child.getDistanceToBaseline(textBaseline, onlyReal: true);
+              if (childBaseline != null) {
+                beforeBaselineDistance = math.max(beforeBaselineDistance, childBaseline);
+                afterBaselineDistance = math.max(afterBaselineDistance, child.size.height - childBaseline);
+                baselines[x] = childBaseline;
+                haveBaseline = true;
+              } else {
+                rowHeight = math.max(rowHeight, child.size.height);
+                childParentData.offset = new Offset(positions[x], rowTop);
+              }
+              break;
+            case CellVerticalAlignment.top:
+            case CellVerticalAlignment.middle:
+            case CellVerticalAlignment.bottom:
+              child.layout(new BoxConstraints.tightFor(width: widths[x]), parentUsesSize: true);
+              rowHeight = math.max(rowHeight, child.size.height);
+              break;
+            case CellVerticalAlignment.fill:
+              break;
+          }
         }
+      }
+      if (haveBaseline) {
+        if (y == 0)
+          _baselineDistance = beforeBaselineDistance;
+        rowHeight = math.max(rowHeight, beforeBaselineDistance + afterBaselineDistance);
       }
       for (int x = 0; x < columns; x += 1) {
         final int xy = x + y * columns;
         RenderBox child = _children[xy];
         if (child != null) {
-          final BoxParentData childParentData = child.parentData;
-          // TODO(ianh): cell vertical alignment in the row
-          childParentData.offset = new Offset(positions[x], rowTop);
+          final TableCellParentData childParentData = child.parentData;
+          switch (childParentData.verticalAlignment) {
+            case CellVerticalAlignment.baseline:
+              if (baselines[x] != null)
+                childParentData.offset = new Offset(positions[x], rowTop + beforeBaselineDistance - baselines[x]);
+              break;
+            case CellVerticalAlignment.top:
+              childParentData.offset = new Offset(positions[x], rowTop);
+              break;
+            case CellVerticalAlignment.middle:
+              childParentData.offset = new Offset(positions[x], rowTop + (rowHeight - child.size.height) / 2.0);
+              break;
+            case CellVerticalAlignment.bottom:
+              childParentData.offset = new Offset(positions[x], rowTop + rowHeight - child.size.height);
+              break;
+            case CellVerticalAlignment.fill:
+              child.layout(new BoxConstraints.tightFor(width: widths[x], height: rowHeight));
+              childParentData.offset = new Offset(positions[x], rowTop);
+              break;
+          }
         }
       }
       rowTop += rowHeight;
     }
     size = constraints.constrain(new Size(positions.last + widths.last, rowTop));
+    assert(_rowTops.length == rows);
   }
 
   @override
@@ -495,6 +681,7 @@ class RenderTable extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    assert(_rowTops.length == rows);
     for (int index = 0; index < _children.length; index += 1) {
       RenderBox child = _children[index];
       if (child != null) {
@@ -502,7 +689,41 @@ class RenderTable extends RenderBox {
         context.paintChild(child, childParentData.offset + offset);
       }
     }
-    // TODO(ianh): paint borders
+    Rect bounds = offset & size;
+    Canvas canvas = context.canvas;
+    canvas.saveLayer(bounds, new Paint());
+    switch (border.verticalInside.style) {
+      case BorderStyle.solid:
+        Paint paint = new Paint()
+          ..color = border.verticalInside.color
+          ..strokeWidth = border.verticalInside.width
+          ..style = PaintingStyle.stroke;
+        Path path = new Path();
+        for (int x = 1; x < columns; x += 1) {
+          path.moveTo(bounds.left + _columnLefts[x], bounds.top);
+          path.lineTo(bounds.left + _columnLefts[x], bounds.bottom);
+        }
+        canvas.drawPath(path, paint);
+        break;
+      case BorderStyle.none: break;
+    }
+    switch (border.horizontalInside.style) {
+      case BorderStyle.solid:
+        Paint paint = new Paint()
+          ..color = border.horizontalInside.color
+          ..strokeWidth = border.horizontalInside.width
+          ..style = PaintingStyle.stroke;
+        Path path = new Path();
+        for (int y = 1; y < rows; y += 1) {
+          path.moveTo(bounds.left, bounds.top + _rowTops[y]);
+          path.lineTo(bounds.right, bounds.top + _rowTops[y]);
+        }
+        canvas.drawPath(path, paint);
+        break;
+      case BorderStyle.none: break;
+    }
+    border.paint(canvas, bounds);
+    canvas.restore();
   }
 
   @override
@@ -542,6 +763,11 @@ final TextStyle kCellTextStyle = new TextStyle(
   color: const Color(0xFF004D40)
 );
 
+void handlePointerDown(Train train) {
+  train.checked = !train.checked;
+  train.checkRenderer?.opacity = train.checked ? 1.0 : 0.0;
+}
+
 void main() { 
   new RenderingFlutterBinding(
     root: new RenderDecoratedBox(
@@ -549,17 +775,17 @@ void main() {
         backgroundColor: const Color(0xFFFFFFFF)
       ),
       child: new RenderPadding(
-        padding: new EdgeInsets.TRBL(
+        padding: new EdgeInsets.fromLTRB(
+          ui.window.padding.left,
           ui.window.padding.top,
           ui.window.padding.right,
-          ui.window.padding.bottom,
-          ui.window.padding.left
+          ui.window.padding.bottom
         ),
         child: new RenderViewport(
           child: new RenderBlock(
             children: <RenderBox>[
               new RenderPadding(
-                padding: new EdgeInsets.TRBL(4.0, 4.0, 8.0, 4.0),
+                padding: new EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 8.0),
                 child: new RenderParagraph(
                   new TextSpan(
                     text: 'My 2016 Märklin Trains Wishlist',
@@ -572,7 +798,7 @@ void main() {
                 )
               ),
               new RenderTable(
-                columns: 3,
+                border: new TableBorder.symmetric(inside: new BorderSide(width: 1.0)),
                 columnWidths: const <int, ColumnWidth>{
                   0: const IntrinsicColumnWidth(),
                   1: const MaxColumnWidth(const IntrinsicColumnWidth(), const FractionColumnWidth(0.4)),
@@ -610,40 +836,54 @@ void main() {
                   ];
                   for (Train train in kTrainData) {
                     yield <RenderBox>[
-                      new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
-                        child: new RenderBlock(
-                          children: <RenderBox>[
-                            new RenderParagraph(
-                              new TextSpan(
-                                text: train.code,
-                                style: kCellTextStyle
-                              )
-                            ),
-                            new RenderPadding(
-                              padding: new EdgeInsets.only(top: 4.0),
-                              child: new RenderPositionedBox(
-                                child: new RenderConstrainedBox(
-                                  additionalConstraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
-                                  child: new RenderDecoratedBox(
-                                    decoration: new BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      backgroundColor: const Color(0xFF43A047)
+                      new RenderPointerListener(
+                        onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
+                        child: new RenderPadding(
+                          padding: new EdgeInsets.all(4.0),
+                          child: new RenderBlock(
+                            children: <RenderBox>[
+                              new RenderParagraph(
+                                new TextSpan(
+                                  text: train.code,
+                                  style: kCellTextStyle
+                                )
+                              ),
+                              train.checkRenderer = new RenderOpacity(
+                                opacity: train.checked ? 1.0 : 0.0,
+                                child: new RenderPadding(
+                                  padding: new EdgeInsets.only(top: 4.0),
+                                  child: new RenderPositionedBox(
+                                    child: new RenderConstrainedBox(
+                                      additionalConstraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
+                                      child: new RenderDecoratedBox(
+                                        decoration: new BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          backgroundColor: const Color(0xFF43A047)
+                                        )
+                                      )
                                     )
                                   )
                                 )
                               )
-                            )
-                          ]
+                            ]
+                          )
                         )
                       ),
-                      train.imageRenderer = new RenderImage(),
-                      new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
-                        child: new RenderParagraph(
-                          new TextSpan(
-                            text: train.description,
-                            style: kCellTextStyle
+                      new RenderPointerListener(
+                        onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
+                        child: train.imageRenderer = new RenderImage(
+                          fit: ImageFit.fitWidth
+                        )
+                      )..parentData = (new TableCellParentData()..verticalAlignment = CellVerticalAlignment.fill),
+                      new RenderPointerListener(
+                        onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
+                        child: new RenderPadding(
+                          padding: new EdgeInsets.all(4.0),
+                          child: new RenderParagraph(
+                            new TextSpan(
+                              text: train.description,
+                              style: kCellTextStyle
+                            )
                           )
                         )
                       ),
@@ -663,6 +903,4 @@ void main() {
       train.imageRenderer.image = imageInfo.image;
     });
   }
-  // TODO(ianh): interactivity on the rows to toggle the circle icons
-  new Timer(new Duration(seconds: 1), debugDumpRenderTree);
 }
