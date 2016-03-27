@@ -11,6 +11,9 @@ class Train {
 
   ui.Image image;
   RenderImage imageRenderer;
+
+  bool checked = false;
+  RenderOpacity checkRenderer;
 }
 
 final List<Train> kTrainData = <Train>[
@@ -37,6 +40,11 @@ final TextStyle kCellTextStyle = new TextStyle(
   fontSize: tableTextSize,
   color: const Color(0xFF004D40)
 );
+
+void handlePointerDown(Train train) {
+  train.checked = !train.checked;
+  train.checkRenderer?.opacity = train.checked ? 1.0 : 0.0;
+}
 
 void main() { 
   new RenderingFlutterBinding(
@@ -106,25 +114,54 @@ void main() {
                   ];
                   for (Train train in kTrainData) {
                     yield <RenderBox>[
-                      new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
-                          child: new RenderParagraph(
-                            new TextSpan(
-                              text: train.code,
-                              style: kCellTextStyle
-                            )
+                      new RenderPointerListener(
+                        onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
+                        child: new RenderPadding(
+                          padding: new EdgeInsets.all(4.0),
+                          child: new RenderBlock(
+                            children: <RenderBox>[
+                              new RenderParagraph(
+                                new TextSpan(
+                                  text: train.code,
+                                  style: kCellTextStyle
+                                )
+                              ),
+                              train.checkRenderer = new RenderOpacity(
+                                opacity: train.checked ? 1.0 : 0.0,
+                                child: new RenderPadding(
+                                  padding: new EdgeInsets.only(top: 4.0),
+                                  child: new RenderPositionedBox(
+                                    child: new RenderConstrainedBox(
+                                      additionalConstraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
+                                      child: new RenderDecoratedBox(
+                                        decoration: new BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          backgroundColor: const Color(0xFF43A047)
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            ]
                           )
                         )
                       ),
-                      train.imageRenderer = new RenderImage(
-                        fit: ImageFit.fitWidth
-                      )..parentData = (new TableCellParentData()..verticalAlignment = CellVerticalAlignment.fill),
-                      new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
-                        child: new RenderParagraph(
-                          new TextSpan(
-                            text: train.description,
-                            style: kCellTextStyle
+                      new RenderPointerListener(
+                        onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
+                        child: train.imageRenderer = new RenderImage(
+                          fit: ImageFit.fitWidth
+                        )
+                      )..parentData = (new TableCellParentData()..verticalAlignment = TableCellVerticalAlignment.fill),
+                      new RenderPointerListener(
+                        onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
+                        child: new RenderPadding(
+                          padding: new EdgeInsets.all(4.0),
+                          child: new RenderParagraph(
+                            new TextSpan(
+                              text: train.description,
+                              style: kCellTextStyle
+                            )
                           )
                         )
                       ),
