@@ -112,8 +112,7 @@ class Text {
 
 const double captionSize = 24.0;
 const double tableTextSize = 16.0;
-const double horizontalPadding = 4.0;
-const double verticalPadding = 4.0;
+const double margin = 4.0;
 
 final TextStyle kCaptionTextStyle = new TextStyle(
   fontSize: tableTextSize,
@@ -183,18 +182,19 @@ void render(Duration duration) {
 
   title.paint(c, new Rect.fromLTWH(
     window.padding.left,
-    window.padding.top + verticalPadding,
+    window.padding.top + margin,
     width,
     captionSize
   ));
 
-  final List<double> columnWidths = captions.map/*<double>*/((Text caption) => caption.naturalMaxWidth + horizontalPadding * 2.0).toList();
+  final List<double> columnWidths = captions.map/*<double>*/((Text caption) => caption.naturalMaxWidth + margin * 2.0).toList();
+  double imageWidths = 0.0;
   for (int index = 0; index < kTrainData.length; index += 1) {
     Train train = kTrainData[index];
-    columnWidths[0] = math.max(columnWidths[0], train.code.naturalMaxWidth + horizontalPadding * 2.0);
+    columnWidths[0] = math.max(columnWidths[0], train.code.naturalMaxWidth + margin * 2.0);
     if (train.image != null)
       imageWidths = math.max(imageWidths, train.image.width.toDouble());
-    columnWidths[2] = math.max(columnWidths[2], train.description.naturalMaxWidth + horizontalPadding * 2.0);
+    columnWidths[2] = math.max(columnWidths[2], train.description.naturalMaxWidth + margin * 2.0);
   }
   // make the image column max 40% (and take into account the device pixel ratio)
   columnWidths[1] = math.max(columnWidths[1], math.min(imageWidths / window.devicePixelRatio, width * 0.4));
@@ -202,27 +202,27 @@ void render(Duration duration) {
 
   final Path path = new Path();
 
-  final double tableTop = window.padding.top + verticalPadding + captionSize + verticalPadding * 2.0;
+  final double tableTop = window.padding.top + margin + title.actualHeight(width) + margin * 2.0;
   double y = tableTop;
   double x = window.padding.left;
   double rowHeight = 0.0;
   for (int index = 0; index < captions.length; index += 1) {
-    final double cellInnerWidth = columnWidths[index] - horizontalPadding * 2.0;
+    final double cellInnerWidth = columnWidths[index] - margin * 2.0;
     rowHeight = math.max(rowHeight, captions[index].actualHeight(cellInnerWidth));
-    captions[index].paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, cellInnerWidth, rowHeight));
+    captions[index].paint(c, new Rect.fromLTWH(x + margin, y + margin, cellInnerWidth, rowHeight));
     x += columnWidths[index];
   }
-  y += tableTextSize + verticalPadding * 2.0;
+  y += tableTextSize + margin * 2.0;
   for (int index = 0; index < kTrainData.length; index += 1) {
     final Train train = kTrainData[index];
-    y += verticalPadding;
+    y += margin;
     x = window.padding.left;
     path.moveTo(x, y);
-    train.code.paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, columnWidths[0] - horizontalPadding * 2.0, tableTextSize));
-    final double rowHeight = math.max(train.description.actualHeight(columnWidths[2] - horizontalPadding * 2.0), tableTextSize);
+    train.code.paint(c, new Rect.fromLTWH(x + margin, y + margin, columnWidths[0] - margin * 2.0, tableTextSize));
+    final double rowHeight = math.max(train.description.actualHeight(columnWidths[2] - margin * 2.0), tableTextSize);
     x += columnWidths[0];
     if (train.image != null) {
-      final Rect destRect = new Rect.fromLTWH(x, y, columnWidths[1], rowHeight + verticalPadding * 2.0);
+      final Rect destRect = new Rect.fromLTWH(x, y, columnWidths[1], rowHeight + margin * 2.0);
       final double sourceHeight = train.image.width.toDouble() * destRect.height / destRect.width;
       final Rect sourceRect = new Rect.fromLTWH(
         0.0,
@@ -233,10 +233,10 @@ void render(Duration duration) {
       c.drawImageRect(train.image, sourceRect, destRect, null);
     }
     x += columnWidths[1];
-    train.description.paint(c, new Rect.fromLTWH(x + horizontalPadding, y + verticalPadding, columnWidths[2] - horizontalPadding * 2.0, rowHeight));
+    train.description.paint(c, new Rect.fromLTWH(x + margin, y + margin, columnWidths[2] - margin * 2.0, rowHeight));
     x += columnWidths[2];
     path.lineTo(x, y);
-    y += rowHeight + verticalPadding * 2.0;
+    y += rowHeight + margin;
   }
   final double tableBottom = y;
 

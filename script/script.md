@@ -44,12 +44,17 @@ $ flutter run
 
 Success!
 
+Pros of this approach: There's only one code path.
+Cons of this approach: You do a ton of work every frame.
+
 
 Chapter 2: Adding more to the app
 ---------------------------------
 
 Ok. Let's add a checkbox to the first cell of each row so that we can
 track which one's I've preordered.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter2/trains/lib/main.dart>
 
 
 Chapter 3: Rendering library
@@ -59,11 +64,17 @@ Having to do all these calculations is ridiculous.
 
 Let's use a library that provides render objects.
 
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter3/trains/lib/main.dart>
+
+Side bar: Let's explain what's going on here.
+
 
 Chapter 4: Adding more to the app
 ---------------------------------
 
 Let's add the "checkbox" again.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter4/trains/lib/main.dart>
 
 
 Chapter 5: Widgets
@@ -74,11 +85,21 @@ Let's use a library that provides an abstraction over the render
 objects so that you just build the app each time and it efficiently
 redoes the layout only as needed.
 
-This is the third time I've written this app, and I'm getting
-exceedingly efficient at it.
+![This is the third time I've written this app, and I'm getting exceedingly efficient at it.](https://i.ytimg.com/vi/ZKpFFD7aX3c/maxresdefault.jpg)
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter5/trains/lib/main.dart>
+
+Side bar: Let's explain what's going on here.
 
 
 Chapter 6: Adding more to the app
 ---------------------------------
 
 Let's add the "checkbox" again.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter6/trains/lib/main.dart>
+
+
+Chapter 7: Stateful builder
+---------------------------
+

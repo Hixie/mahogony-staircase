@@ -27,8 +27,7 @@ final List<Train> kTrainData = <Train>[
 
 const double captionSize = 24.0;
 const double tableTextSize = 16.0;
-const double horizontalPadding = 4.0;
-const double verticalPadding = 4.0;
+const double margin = 4.0;
 const double iconSize = 24.0;
 
 final TextStyle kCaptionTextStyle = new TextStyle(
@@ -63,7 +62,7 @@ void main() {
           child: new RenderBlock(
             children: <RenderBox>[
               new RenderPadding(
-                padding: new EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 8.0),
+                padding: new EdgeInsets.fromLTRB(margin, margin, margin, margin * 2.0),
                 child: new RenderParagraph(
                   new TextSpan(
                     text: 'My 2016 Märklin Trains Wishlist',
@@ -76,7 +75,7 @@ void main() {
                 )
               ),
               new RenderTable(
-                border: new TableBorder.symmetric(inside: new BorderSide(width: 1.0)),
+                border: new TableBorder.symmetric(inside: new BorderSide(width: 0.0)),
                 columnWidths: const <int, TableColumnWidth>{
                   0: const IntrinsicColumnWidth(),
                   1: const MaxColumnWidth(const IntrinsicColumnWidth(), const FractionColumnWidth(0.4)),
@@ -85,7 +84,7 @@ void main() {
                 children: new List<List<RenderBox>>.from((() sync* {
                   yield <RenderBox>[
                     new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
+                      padding: new EdgeInsets.all(margin),
                       child: new RenderParagraph(
                         new TextSpan(
                           text: 'Code',
@@ -94,7 +93,7 @@ void main() {
                       )
                     ),
                     new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
+                      padding: new EdgeInsets.all(margin),
                       child: new RenderParagraph(
                         new TextSpan(
                           text: 'Image',
@@ -103,7 +102,7 @@ void main() {
                       )
                     ),
                     new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
+                      padding: new EdgeInsets.all(margin),
                       child: new RenderParagraph(
                         new TextSpan(
                           text: 'Description',
@@ -117,7 +116,7 @@ void main() {
                       new RenderPointerListener(
                         onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
                         child: new RenderPadding(
-                          padding: new EdgeInsets.all(4.0),
+                          padding: new EdgeInsets.all(margin),
                           child: new RenderBlock(
                             children: <RenderBox>[
                               new RenderParagraph(
@@ -129,7 +128,7 @@ void main() {
                               train.checkRenderer = new RenderOpacity(
                                 opacity: train.checked ? 1.0 : 0.0,
                                 child: new RenderPadding(
-                                  padding: new EdgeInsets.only(top: 4.0),
+                                  padding: new EdgeInsets.only(top: margin),
                                   child: new RenderPositionedBox(
                                     child: new RenderConstrainedBox(
                                       additionalConstraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
@@ -156,7 +155,7 @@ void main() {
                       new RenderPointerListener(
                         onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
                         child: new RenderPadding(
-                          padding: new EdgeInsets.all(4.0),
+                          padding: new EdgeInsets.all(margin),
                           child: new RenderParagraph(
                             new TextSpan(
                               text: train.description,
