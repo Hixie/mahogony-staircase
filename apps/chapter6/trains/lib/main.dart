@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class Train {
@@ -27,8 +25,7 @@ final List<Train> kTrainData = <Train>[
 
 const double captionSize = 24.0;
 const double tableTextSize = 16.0;
-const double horizontalPadding = 4.0;
-const double verticalPadding = 4.0;
+const double margin = 4.0;
 const double iconSize = 24.0;
 
 final TextStyle kCaptionTextStyle = new TextStyle(
@@ -63,7 +60,7 @@ void redraw() {
           child: new BlockBody(
             children: <Widget>[
               new Padding(
-                padding: new EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 8.0),
+                padding: new EdgeInsets.fromLTRB(margin, margin, margin, margin * 2.0),
                 child: new RichText(
                   text: new TextSpan(
                     text: 'My 2016 Märklin Trains Wishlist',
@@ -76,7 +73,7 @@ void redraw() {
                 )
               ),
               new Table(
-                border: new TableBorder.symmetric(inside: new BorderSide(width: 1.0)),
+                border: new TableBorder.symmetric(inside: new BorderSide(width: 0.0)),
                 columnWidths: const <int, TableColumnWidth>{
                   0: const IntrinsicColumnWidth(),
                   1: const MaxColumnWidth(const IntrinsicColumnWidth(), const FractionColumnWidth(0.4)),
@@ -86,7 +83,7 @@ void redraw() {
                   yield new TableRow(
                     children: <Widget>[
                       new Padding(
-                        padding: new EdgeInsets.all(4.0),
+                        padding: new EdgeInsets.all(margin),
                         child: new RichText(
                           text: new TextSpan(
                             text: 'Code',
@@ -95,7 +92,7 @@ void redraw() {
                         )
                       ),
                       new Padding(
-                        padding: new EdgeInsets.all(4.0),
+                        padding: new EdgeInsets.all(margin),
                         child: new RichText(
                           text: new TextSpan(
                             text: 'Image',
@@ -104,7 +101,7 @@ void redraw() {
                         )
                       ),
                       new Padding(
-                        padding: new EdgeInsets.all(4.0),
+                        padding: new EdgeInsets.all(margin),
                         child: new RichText(
                           text: new TextSpan(
                             text: 'Description',
@@ -122,7 +119,7 @@ void redraw() {
                           child: new BlockBody(
                             children: <Widget>[
                               new Padding(
-                                padding: new EdgeInsets.all(4.0),
+                                padding: new EdgeInsets.all(margin),
                                 child: new RichText(
                                   text: new TextSpan(
                                     text: train.code,
@@ -133,7 +130,7 @@ void redraw() {
                               new Opacity(
                                 opacity: train.checked ? 1.0 : 0.0,
                                 child: new Padding(
-                                  padding: new EdgeInsets.only(top: 4.0),
+                                  padding: new EdgeInsets.only(top: margin),
                                   child: new Align(
                                     child: new ConstrainedBox(
                                       constraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
@@ -163,7 +160,7 @@ void redraw() {
                         new Listener(
                           onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
                           child: new Padding(
-                            padding: new EdgeInsets.all(4.0),
+                            padding: new EdgeInsets.all(margin),
                             child: new RichText(
                               text:new TextSpan(
                                 text: train.description,

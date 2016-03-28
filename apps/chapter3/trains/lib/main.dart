@@ -24,9 +24,7 @@ final List<Train> kTrainData = <Train>[
 
 const double captionSize = 24.0;
 const double tableTextSize = 16.0;
-const double horizontalPadding = 4.0;
-const double verticalPadding = 4.0;
-const double iconSize = 24.0;
+const double margin = 4.0;
 
 final TextStyle kCaptionTextStyle = new TextStyle(
   fontSize: tableTextSize,
@@ -55,7 +53,7 @@ void main() {
           child: new RenderBlock(
             children: <RenderBox>[
               new RenderPadding(
-                padding: new EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 8.0),
+                padding: new EdgeInsets.fromLTRB(margin, margin, margin, margin * 2.0),
                 child: new RenderParagraph(
                   new TextSpan(
                     text: 'My 2016 Märklin Trains Wishlist',
@@ -68,7 +66,7 @@ void main() {
                 )
               ),
               new RenderTable(
-                border: new TableBorder.symmetric(inside: new BorderSide(width: 1.0)),
+                border: new TableBorder.symmetric(inside: new BorderSide(width: 0.0)),
                 columnWidths: const <int, TableColumnWidth>{
                   0: const IntrinsicColumnWidth(),
                   1: const MaxColumnWidth(const IntrinsicColumnWidth(), const FractionColumnWidth(0.4)),
@@ -77,7 +75,7 @@ void main() {
                 children: new List<List<RenderBox>>.from((() sync* {
                   yield <RenderBox>[
                     new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
+                      padding: new EdgeInsets.all(margin),
                       child: new RenderParagraph(
                         new TextSpan(
                           text: 'Code',
@@ -86,7 +84,7 @@ void main() {
                       )
                     ),
                     new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
+                      padding: new EdgeInsets.all(margin),
                       child: new RenderParagraph(
                         new TextSpan(
                           text: 'Image',
@@ -95,7 +93,7 @@ void main() {
                       )
                     ),
                     new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
+                      padding: new EdgeInsets.all(margin),
                       child: new RenderParagraph(
                         new TextSpan(
                           text: 'Description',
@@ -107,7 +105,7 @@ void main() {
                   for (Train train in kTrainData) {
                     yield <RenderBox>[
                       new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
+                        padding: new EdgeInsets.all(margin),
                         child: new RenderParagraph(
                           new TextSpan(
                             text: train.code,
@@ -119,7 +117,7 @@ void main() {
                         fit: ImageFit.fitWidth
                       )..parentData = (new TableCellParentData()..verticalAlignment = TableCellVerticalAlignment.fill),
                       new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
+                        padding: new EdgeInsets.all(margin),
                         child: new RenderParagraph(
                           new TextSpan(
                             text: train.description,
