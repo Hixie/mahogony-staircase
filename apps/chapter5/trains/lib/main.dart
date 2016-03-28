@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 class Train {
   Train(this.code, this.imageUrl, this.description);
@@ -10,7 +12,6 @@ class Train {
   final String description;
 
   ui.Image image;
-  RenderImage imageRenderer;
 }
 
 final List<Train> kTrainData = <Train>[
@@ -38,26 +39,26 @@ final TextStyle kCellTextStyle = new TextStyle(
   color: const Color(0xFF004D40)
 );
 
-void main() { 
-  new RenderingFlutterBinding(
-    root: new RenderDecoratedBox(
+void redraw() {
+  runApp(
+    new DecoratedBox(
       decoration: new BoxDecoration(
         backgroundColor: const Color(0xFFFFFFFF)
       ),
-      child: new RenderPadding(
+      child: new Padding(
         padding: new EdgeInsets.fromLTRB(
           ui.window.padding.left,
           ui.window.padding.top,
           ui.window.padding.right,
           ui.window.padding.bottom
         ),
-        child: new RenderViewport(
-          child: new RenderBlock(
-            children: <RenderBox>[
-              new RenderPadding(
+        child: new Viewport(
+          child: new BlockBody(
+            children: <Widget>[
+              new Padding(
                 padding: new EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 8.0),
-                child: new RenderParagraph(
-                  new TextSpan(
+                child: new RichText(
+                  text: new TextSpan(
                     text: 'My 2016 Märklin Trains Wishlist',
                     style: new TextStyle(
                       fontSize: captionSize,
@@ -67,67 +68,75 @@ void main() {
                   )
                 )
               ),
-              new RenderTable(
+              new Table(
                 border: new TableBorder.symmetric(inside: new BorderSide(width: 1.0)),
                 columnWidths: const <int, TableColumnWidth>{
                   0: const IntrinsicColumnWidth(),
                   1: const MaxColumnWidth(const IntrinsicColumnWidth(), const FractionColumnWidth(0.4)),
                   2: const FlexColumnWidth(),
                 },
-                children: new List<List<RenderBox>>.from((() sync* {
-                  yield <RenderBox>[
-                    new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
-                      child: new RenderParagraph(
-                        new TextSpan(
-                          text: 'Code',
-                          style: kCaptionTextStyle
+                children: new List<TableRow>.from((() sync* {
+                  yield new TableRow(
+                    children: <Widget>[
+                      new Padding(
+                        padding: new EdgeInsets.all(4.0),
+                        child: new RichText(
+                          text: new TextSpan(
+                            text: 'Code',
+                            style: kCaptionTextStyle
+                          )
                         )
-                      )
-                    ),
-                    new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
-                      child: new RenderParagraph(
-                        new TextSpan(
-                          text: 'Image',
-                          style: kCaptionTextStyle
+                      ),
+                      new Padding(
+                        padding: new EdgeInsets.all(4.0),
+                        child: new RichText(
+                          text: new TextSpan(
+                            text: 'Image',
+                            style: kCaptionTextStyle
+                          )
                         )
-                      )
-                    ),
-                    new RenderPadding(
-                      padding: new EdgeInsets.all(4.0),
-                      child: new RenderParagraph(
-                        new TextSpan(
-                          text: 'Description',
-                          style: kCaptionTextStyle
+                      ),
+                      new Padding(
+                        padding: new EdgeInsets.all(4.0),
+                        child: new RichText(
+                          text: new TextSpan(
+                            text: 'Description',
+                            style: kCaptionTextStyle
+                          )
                         )
-                      )
-                    ),
-                  ];
+                      ),
+                    ]
+                  );
                   for (Train train in kTrainData) {
-                    yield <RenderBox>[
-                      new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
-                        child: new RenderParagraph(
-                          new TextSpan(
-                            text: train.code,
-                            style: kCellTextStyle
+                    yield new TableRow(
+                      children: <Widget>[
+                        new Padding(
+                          padding: new EdgeInsets.all(4.0),
+                          child: new RichText(
+                            text: new TextSpan(
+                              text: train.code,
+                              style: kCellTextStyle
+                            )
                           )
-                        )
-                      ),
-                      train.imageRenderer = new RenderImage(
-                        fit: ImageFit.fitWidth
-                      )..parentData = (new TableCellParentData()..verticalAlignment = TableCellVerticalAlignment.fill),
-                      new RenderPadding(
-                        padding: new EdgeInsets.all(4.0),
-                        child: new RenderParagraph(
-                          new TextSpan(
-                            text: train.description,
-                            style: kCellTextStyle
+                        ),
+                        new Cell(
+                          verticalAlignment: TableCellVerticalAlignment.fill,
+                          child: new RawImage(
+                            fit: ImageFit.fitWidth,
+                            image: train.image
                           )
-                        )
-                      ),
-                    ];
+                        ),
+                        new Padding(
+                          padding: new EdgeInsets.all(4.0),
+                          child: new RichText(
+                            text:new TextSpan(
+                              text: train.description,
+                              style: kCellTextStyle
+                            )
+                          )
+                        ),
+                      ]
+                    );
                   }
                 })())
               ),
@@ -137,10 +146,15 @@ void main() {
       )
     )
   );
+}
+
+void main() {
+  redraw();
   for (Train train in kTrainData) {
     ImageResource resource = imageCache.load(train.imageUrl);
     resource.first.then((ImageInfo imageInfo) {
-      train.imageRenderer.image = imageInfo.image;
+      train.image = imageInfo.image;
+      redraw();
     });
   }
 }
