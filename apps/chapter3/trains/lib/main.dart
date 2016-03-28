@@ -108,17 +108,16 @@ void main() {
                     yield <RenderBox>[
                       new RenderPadding(
                         padding: new EdgeInsets.all(4.0),
-                          child: new RenderParagraph(
-                            new TextSpan(
-                              text: train.code,
-                              style: kCellTextStyle
-                            )
+                        child: new RenderParagraph(
+                          new TextSpan(
+                            text: train.code,
+                            style: kCellTextStyle
                           )
                         )
                       ),
                       train.imageRenderer = new RenderImage(
                         fit: ImageFit.fitWidth
-                      )..parentData = (new TableCellParentData()..verticalAlignment = CellVerticalAlignment.fill),
+                      )..parentData = (new TableCellParentData()..verticalAlignment = TableCellVerticalAlignment.fill),
                       new RenderPadding(
                         padding: new EdgeInsets.all(4.0),
                         child: new RenderParagraph(
