@@ -103,3 +103,55 @@ Let's add the "checkbox" again.
 Chapter 7: Stateful builder
 ---------------------------
 
+We can move the state back into the tree using a StatefulBuilder.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter7/trains/lib/main.dart>
+
+
+Chapter 8: Stateful widgets
+---------------------------
+
+Code reuse demands that we be able to extract these little bits out.
+
+We want to have a State that lives longer than the Widgets, so we have
+the Widget create a State the first time the tree is built, and then
+we reuse it later.
+
+Thus, NetworkImage!
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter8/trains/lib/main.dart>
+
+Turns out that is one of our built-in components, so we can just
+remove all this code.
+
+
+Chapter 9: Stateless stateful widgets
+-------------------------------------
+
+One pattern we use a lot here is this padding + text pattern. Since we
+now know how to create reusable components, let's make one for this
+pattern.
+
+We can even use this for the title, if we take out half the bottom
+padding and put it after the title.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter9/trains/lib/main.dart>
+
+
+Chapter A: Stateless stateful widgets
+-------------------------------------
+
+We don't really need two classes here. We could put our build()
+function on the Widget, and make a subclass of State that just always
+calls it. That way, when the object has no state, we'd just use that
+State and not need to create one ourselves.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapterA/trains/lib/main.dart>
+
+
+Chapter B: Stateless stateful widgets
+-------------------------------------
+
+That's what StatelessWidget is.
+
+<https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapterB/trains/lib/main.dart>
