@@ -9,7 +9,7 @@ set -e
 
 pushd ..
 git clone https://github.com/flutter/flutter.git
-export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin
+export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:/usr/bin:/bin
 flutter doctor
 popd
 
