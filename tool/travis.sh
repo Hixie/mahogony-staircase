@@ -13,6 +13,6 @@ export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
 flutter doctor
 popd
 
-pwd
+echo $PATH
 find apps -maxdepth 3 -name pubspec.yaml -execdir pub get \;
 find apps -maxdepth 3 -name pubspec.yaml -execdir flutter analyze \;
