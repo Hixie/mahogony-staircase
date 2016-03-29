@@ -155,3 +155,39 @@ Chapter B: Stateless stateful widgets
 That's what StatelessWidget is.
 
 <https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapterB/trains/lib/main.dart>
+
+
+Chapter C: Pre-built widgets
+----------------------------
+
+There are lots of pre-built widgets along the lines of NetworkImage and TextCell.
+
+- DecoratedBox, Padding, Opacity, and ConstrainedBox can all be
+  expressed using Container. This helps keep the code a tiny bit more
+  concise.
+
+- Viewport and BlockBody are actually the building blocks of Block,
+  which also has built-in support for scrolling.
+
+- Instead of a child-less padding, we can use a Container with a
+  height. This actually internally turns into a ConstrainedBox, which
+  we've seen before, and which is much the same as Padding really, but
+  it looks cleaner in the source.
+
+- Instead of a Listener we can use a GestureDetector. This lets you
+  recognise actual gestures like taps, instead of only driving things
+  on tap-down.
+
+- Instead of just making the green dot appear or disappear, we can use
+  an AnimatedContainer to make it transition smoothly.
+
+- Instead of just Align we can use Center to better express the intent.
+
+
+Chapter D: Material widgets
+---------------------------
+
+If we move up yet one more layer, we get to the material library. This
+library is similar to the widgets library, but it introduces user
+interface widgets from material design, like buttons, checkboxes, and
+so forth.
