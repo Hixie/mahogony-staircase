@@ -44,9 +44,6 @@ $ flutter run
 
 Success!
 
-Pros of this approach: There's only one code path.
-Cons of this approach: You do a ton of work every frame.
-
 
 Chapter 2: Adding more to the app
 ---------------------------------
@@ -55,6 +52,17 @@ Ok. Let's add a checkbox to the first cell of each row so that we can
 track which one's I've preordered.
 
 <https://github.com/Hixie/mahogony-staircase/blob/master/apps/chapter2/trains/lib/main.dart>
+
+Pros of this approach:
+- There's only one code path.
+- There's no question what's going on.
+
+Cons of this approach:
+- You do a ton of work every frame.
+- Holy cow the mathematics.
+
+Trees:
+
 
 
 Chapter 3: Rendering library
