@@ -192,7 +192,7 @@ void main() {
                                 ]
                               )
                             ),
-                            new Cell(
+                            new TableCell(
                               verticalAlignment: TableCellVerticalAlignment.fill,
                               child: new Listener(
                                 onPointerDown: (PointerDownEvent event) => handlePointerDown(train),

@@ -1,4 +1,4 @@
 flutter analyze --debug
 # flutter test --debug
-flutter run --debug
+flutter run --no-checked
 flutter logs

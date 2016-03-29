@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class Train {
@@ -116,7 +115,7 @@ void redraw() {
                             )
                           )
                         ),
-                        new Cell(
+                        new TableCell(
                           verticalAlignment: TableCellVerticalAlignment.fill,
                           child: new RawImage(
                             fit: ImageFit.fitWidth,

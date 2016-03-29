@@ -124,6 +124,7 @@ void main() {
                                 child: new AnimatedOpacity(
                                   opacity: train.checked ? 1.0 : 0.0,
                                   curve: Curves.ease,
+                                  duration: const Duration(milliseconds: 100),
                                   child: new Container(
                                     padding: new EdgeInsets.only(bottom: margin),
                                     height: iconSize,
@@ -138,7 +139,7 @@ void main() {
                             ]
                           )
                         ),
-                        new Cell(
+                        new TableCell(
                           verticalAlignment: TableCellVerticalAlignment.fill,
                           child: new GestureDetector(
                             onTap: () => handleTrainTap(train),
