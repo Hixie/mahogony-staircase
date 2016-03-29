@@ -190,3 +190,17 @@ If we move up yet one more layer, we get to the material library. This
 library is similar to the widgets library, but it introduces user
 interface widgets from material design, like buttons, checkboxes, and
 so forth.
+
+- We can introduce a MaterialApp, and set our material theme. This
+  also reminds us to set the application title, which is used e.g. in
+  the Android app switcher. We could have done this before, but we had
+  forgotten to do so.
+
+- By convention, we create a widget for our main page. This lets us
+  put much of the app state into a class rather than having it be in
+  global statics.
+
+- We can trivially use a real checkbox instead of a green ball.
+
+- We can get real Ink Wells!
+
