@@ -115,35 +115,35 @@ void main() {
                     yield <RenderBox>[
                       new RenderPointerListener(
                         onPointerDown: (PointerDownEvent event) => handlePointerDown(train),
-                        child: new RenderPadding(
-                          padding: new EdgeInsets.all(margin),
-                          child: new RenderBlock(
-                            children: <RenderBox>[
-                              new RenderParagraph(
+                        child: new RenderBlock(
+                          children: <RenderBox>[
+                            new RenderPadding(
+                              padding: new EdgeInsets.all(margin),
+                              child: new RenderParagraph(
                                 new TextSpan(
                                   text: train.code,
                                   style: kCellTextStyle
                                 )
-                              ),
-                              train.checkRenderer = new RenderOpacity(
-                                opacity: train.checked ? 1.0 : 0.0,
-                                child: new RenderPadding(
-                                  padding: new EdgeInsets.only(top: margin),
-                                  child: new RenderPositionedBox(
-                                    child: new RenderConstrainedBox(
-                                      additionalConstraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
-                                      child: new RenderDecoratedBox(
-                                        decoration: new BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          backgroundColor: const Color(0xFF43A047)
-                                        )
+                              )
+                            ),
+                            train.checkRenderer = new RenderOpacity(
+                              opacity: train.checked ? 1.0 : 0.0,
+                              child: new RenderPadding(
+                                padding: new EdgeInsets.only(bottom: margin),
+                                child: new RenderPositionedBox(
+                                  child: new RenderConstrainedBox(
+                                    additionalConstraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
+                                    child: new RenderDecoratedBox(
+                                      decoration: new BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        backgroundColor: const Color(0xFF43A047)
                                       )
                                     )
                                   )
                                 )
                               )
-                            ]
-                          )
+                            ),
+                          ]
                         )
                       ),
                       new RenderPointerListener(

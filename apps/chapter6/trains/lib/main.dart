@@ -130,7 +130,7 @@ void redraw() {
                               new Opacity(
                                 opacity: train.checked ? 1.0 : 0.0,
                                 child: new Padding(
-                                  padding: new EdgeInsets.only(top: margin),
+                                  padding: new EdgeInsets.only(bottom: margin),
                                   child: new Align(
                                     child: new ConstrainedBox(
                                       constraints: new BoxConstraints.tight(const Size(iconSize, iconSize)),
