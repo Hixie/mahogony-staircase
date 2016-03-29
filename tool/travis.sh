@@ -13,6 +13,5 @@ export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
 flutter doctor
 popd
 
-(cd apps/chapter1/world_clock; pub get)
-(cd apps/chapter1/world_clock; flutter analyze)
-# (cd apps/chapter1/world_clock; flutter test)
+find apps -mindepth 3 -maxdepth 3 -type d -execdir pub get \;
+find apps -mindepth 3 -maxdepth 3 -type d -execdir flutter analyze \;

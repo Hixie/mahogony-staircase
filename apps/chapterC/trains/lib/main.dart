@@ -121,14 +121,17 @@ void main() {
                                 style: kCellTextStyle
                               ),
                               new Center(
-                                child: new AnimatedContainer(
+                                child: new AnimatedOpacity(
                                   opacity: train.checked ? 1.0 : 0.0,
-                                  padding: new EdgeInsets.only(bottom: margin),
-                                  height: iconSize,
-                                  width: iconSize,
-                                  decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    backgroundColor: const Color(0xFF43A047)
+                                  curve: Curves.ease,
+                                  child: new Container(
+                                    padding: new EdgeInsets.only(bottom: margin),
+                                    height: iconSize,
+                                    width: iconSize,
+                                    decoration: new BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      backgroundColor: const Color(0xFF43A047)
+                                    )
                                   )
                                 )
                               )

@@ -162,9 +162,8 @@ Chapter C: Pre-built widgets
 
 There are lots of pre-built widgets along the lines of NetworkImage and TextCell.
 
-- DecoratedBox, Padding, Opacity, and ConstrainedBox can all be
-  expressed using Container. This helps keep the code a tiny bit more
-  concise.
+- DecoratedBox, Padding, and ConstrainedBox can all be expressed using
+  Container. This helps keep the code a tiny bit more concise.
 
 - Viewport and BlockBody are actually the building blocks of Block,
   which also has built-in support for scrolling.
@@ -179,7 +178,7 @@ There are lots of pre-built widgets along the lines of NetworkImage and TextCell
   on tap-down.
 
 - Instead of just making the green dot appear or disappear, we can use
-  an AnimatedContainer to make it transition smoothly.
+  an AnimatedOpacity to make it transition smoothly.
 
 - Instead of just Align we can use Center to better express the intent.
 
