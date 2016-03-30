@@ -62,7 +62,9 @@ Cons of this approach:
 - Holy cow the mathematics.
 
 Trees:
-
+- There's a layer tree buried near the end of the paint calls. We could be really
+  fancy and split the scene into more parts, if the application was animated and
+  we wanted to improve performance.
 
 
 Chapter 3: Rendering library
