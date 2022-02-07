@@ -135,18 +135,23 @@ final List<Text> captions = <Text>[
 ];
 
 void render(Duration duration) {
-  final Rect bounds = Offset.zero & window.physicalSize;
+  final windowSize = window.physicalSize / window.devicePixelRatio;
+  final topPadding = window.padding.top / window.devicePixelRatio;
+  final leftPadding = window.padding.left / window.devicePixelRatio;
+  final rightPadding = window.padding.right / window.devicePixelRatio;
+
+  final Rect bounds = Offset.zero & windowSize;
   final PictureRecorder recorder = PictureRecorder();
   final Canvas c = Canvas(recorder, bounds);
   Paint background = Paint()
     ..color = const Color(0xffffffff);
   c.drawPaint(background);
 
-  final double width = (window.physicalSize.width / window.devicePixelRatio) - window.padding.left - window.padding.right;
+  final double width = windowSize.width - leftPadding - rightPadding;
 
   title.paint(c, Rect.fromLTWH(
-    window.padding.left,
-    window.padding.top + margin,
+    leftPadding,
+    topPadding + margin,
     width,
     captionSize
   ));
@@ -167,9 +172,9 @@ void render(Duration duration) {
 
   final Path path = Path();
 
-  final double tableTop = window.padding.top + margin + title.actualHeight(width) + margin * 2.0;
+  final double tableTop = topPadding + margin + title.actualHeight(width) + margin * 2.0;
   double y = tableTop;
-  double x = window.padding.left;
+  double x = leftPadding;
   double rowHeight = 0.0;
   for (int index = 0; index < captions.length; index += 1) {
     final double cellInnerWidth = columnWidths[index] - margin * 2.0;
@@ -181,7 +186,7 @@ void render(Duration duration) {
   for (int index = 0; index < kTrainData.length; index += 1) {
     final Train train = kTrainData[index];
     y += margin;
-    x = window.padding.left;
+    x = leftPadding;
     path.moveTo(x, y);
     train.code.paint(c, Rect.fromLTWH(x + margin, y + margin, columnWidths[0] - margin * 2.0, tableTextSize));
     final double rowHeight = math.max(train.description.actualHeight(columnWidths[2] - margin * 2.0), tableTextSize);
@@ -205,10 +210,10 @@ void render(Duration duration) {
   }
   final double tableBottom = y;
 
-  path.moveTo(window.padding.left + columnWidths[0], tableTop);
-  path.lineTo(window.padding.left + columnWidths[0], tableBottom);
-  path.moveTo(window.padding.left + columnWidths[0] + columnWidths[1], tableTop);
-  path.lineTo(window.padding.left + columnWidths[0] + columnWidths[1], tableBottom);
+  path.moveTo(leftPadding + columnWidths[0], tableTop);
+  path.lineTo(leftPadding + columnWidths[0], tableBottom);
+  path.moveTo(leftPadding + columnWidths[0] + columnWidths[1], tableTop);
+  path.lineTo(leftPadding + columnWidths[0] + columnWidths[1], tableBottom);
 
   Paint lines = Paint();
   lines.style = PaintingStyle.stroke;
