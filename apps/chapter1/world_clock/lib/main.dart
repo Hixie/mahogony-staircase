@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 
 void paintHand(Canvas c, double radius, double value, double startOffset, double endOffset, double width, Color color, double elevation) {
@@ -92,8 +93,13 @@ void render(Duration duration) {
   nextTickTimer?.cancel();
   nextTickTimer = null;
 
+  final windowSize = window.physicalSize / window.devicePixelRatio;
+  final leftPadding = window.padding.left / window.devicePixelRatio;
+  final rightPadding = window.padding.right / window.devicePixelRatio;
+  final topPadding = window.padding.top / window.devicePixelRatio;
+
   // Background
-  Rect bounds = Offset.zero & window.physicalSize;
+  Rect bounds = Offset.zero & windowSize;
   PictureRecorder recorder = PictureRecorder();
   Canvas c = Canvas(recorder, bounds);
   Paint background = Paint()
@@ -110,16 +116,16 @@ void render(Duration duration) {
   ));
   p.addText('World Clock');
   Paragraph title = p.build();
-  final maxWidth = window.physicalSize.width - window.padding.left - window.padding.right;
+  final maxWidth = windowSize.width - leftPadding - topPadding;
   title.layout(ParagraphConstraints(width: maxWidth));
-  c.drawParagraph(title, Offset(window.padding.left, window.padding.top));
+  c.drawParagraph(title, Offset(leftPadding, topPadding));
 
   // Clocks
-  final double screenWidth = window.physicalSize.width - window.padding.left - window.padding.right;
+  final double screenWidth = windowSize.width - leftPadding - rightPadding;
   final double gutter = screenWidth / 20.0;
   final double radius = (screenWidth - gutter * 3) / 4.0;
-  final double top = window.padding.top + captionSize + gutter;
-  final double left = window.padding.left + gutter;
+  final double top = topPadding + captionSize + gutter;
+  final double left = leftPadding + gutter;
   DateTime now = DateTime.now().toUtc();
   double y = top + radius;
   paintClock(c, left + radius, y, radius, now, const Duration(hours: 0), 'UTC');
@@ -134,12 +140,12 @@ void render(Duration duration) {
   // Send to GPU
   Picture picture = recorder.endRecording();
   SceneBuilder builder = SceneBuilder();
-  // builder.pushTransform(Float64List.fromList(
-  //   <double>[window.devicePixelRatio, 0.0, 0.0, 0.0,
-  //            0.0, window.devicePixelRatio, 0.0, 0.0,
-  //            0.0, 0.0, 1.0, 0.0,
-  //            0.0, 0.0, 0.0, 1.0]
-  // ));
+  builder.pushTransform(Float64List.fromList(
+    <double>[window.devicePixelRatio, 0.0, 0.0, 0.0,
+             0.0, window.devicePixelRatio, 0.0, 0.0,
+             0.0, 0.0, 1.0, 0.0,
+             0.0, 0.0, 0.0, 1.0]
+  ));
   builder.addPicture(Offset.zero, picture);
   // builder.addPerformanceOverlay(0x0F, Rect.fromLTWH(60.0, 260.0, 275.0, 180.0));
   Scene scene = builder.build();
