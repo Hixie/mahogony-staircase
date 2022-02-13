@@ -82,10 +82,10 @@ void main() {
                     style: TextStyle(
                       fontSize: captionSize,
                       color: Color(0xFF4CAF50),
-                      // align: TextAlign.center,
                     ),
                   ),
                   textDirection: TextDirection.ltr,
+                  textAlign: TextAlign.center
                 ),
               ),
             ),
